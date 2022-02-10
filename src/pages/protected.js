@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import React, { useEffect, useState } from "react";
 import { CodeSnippet } from "../components/code-snippet";
 import { getProtectedResource } from "../services/message-service";
@@ -5,9 +6,12 @@ import { getProtectedResource } from "../services/message-service";
 export const ProtectedPage = () => {
   const [message, setMessage] = useState("");
 
+  const { getAccessTokenSilently } = useAuth0();
+
   useEffect(() => {
     const getMessage = async () => {
-      const { data, error } = await getProtectedResource();
+      const accessToken = await getAccessTokenSilently();
+      const { data, error } = await getProtectedResource(accessToken);
 
       if (data) {
         setMessage(JSON.stringify(data, null, 2));
@@ -19,7 +23,7 @@ export const ProtectedPage = () => {
     };
 
     getMessage();
-  }, []);
+  }, [getAccessTokenSilently]);
 
   return (
     <div className="content-layout">
